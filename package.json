@@ -1,0 +1,16 @@
+{
+  "name": "faq-semantic-search",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix apps/backend\" \"npm run dev --prefix apps/frontend\"",
+    "setup-index": "npm run setup --prefix apps/backend",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "test:e2e": "npm test --prefix apps/e2e",
+    "evaluate": "npm run evaluate --prefix apps/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

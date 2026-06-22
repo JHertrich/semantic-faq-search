@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ Semantic Search – UI Mockup</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f7f6f3;
+      --color-bg-tertiary: #f1efe8;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary: #888780;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-secondary: rgba(0,0,0,0.22);
+      --purple-50: #EEEDFE;
+      --purple-200: #AFA9EC;
+      --purple-600: #534AB7;
+      --purple-800: #3C3489;
+      --amber-300: #FAC775;
+      --amber-900: #412402;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #252522;
+        --color-bg-tertiary: #2c2c2a;
+        --color-text-primary: #f0ede8;
+        --color-text-secondary: #a8a69f;
+        --color-text-tertiary: #6e6d68;
+        --color-border: rgba(255,255,255,0.1);
+        --color-border-secondary: rgba(255,255,255,0.18);
+        --purple-50: #26215C;
+        --purple-200: #534AB7;
+        --purple-600: #AFA9EC;
+        --purple-800: #CECBF6;
+        --amber-300: #633806;
+        --amber-900: #FAC775;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Mockup label ── */
+    .mockup-banner {
+      max-width: 860px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+    }
+    .mockup-banner span {
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+    /* ── App container ── */
+    .app {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--color-border);
+      padding: 2rem 2rem 2.5rem;
+    }
+
+    /* ── Header ── */
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+    .header p  { font-size: 14px; color: var(--color-text-secondary); }
+
+    /* ── Search bar ── */
+    .search-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .search-wrap { flex: 1; position: relative; }
+    .search-wrap i {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 18px; color: var(--color-text-tertiary); pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 0 12px 0 40px; height: 42px;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      font-size: 15px; color: var(--color-text-primary);
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-input:focus {
+      border-color: var(--purple-600);
+      box-shadow: 0 0 0 3px rgba(83,74,183,0.15);
+    }
+    .search-btn {
+      padding: 0 20px; height: 42px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--purple-600); color: #fff;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: opacity 0.15s;
+    }
+    .search-btn:hover { opacity: 0.88; }
+    .search-btn i { font-size: 16px; }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .status-tag { font-size: 13px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px; }
+    .badge {
+      background: var(--purple-50); color: var(--purple-800);
+      font-size: 12px; font-weight: 500;
+      padding: 2px 10px; border-radius: 99px;
+    }
+    .badge-score {
+      background: var(--color-bg-secondary); color: var(--color-text-secondary);
+      font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: 99px;
+    }
+    .badge-top {
+      background: var(--purple-50); color: var(--purple-800);
+      font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: 99px;
+    }
+    .clear-btn {
+      font-size: 13px; color: var(--purple-600);
+      background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .clear-btn:hover { text-decoration: underline; }
+
+    /* ── Accordion ── */
+    .accordion {
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: var(--color-bg);
+      transition: border-color 0.2s;
+    }
+    .accordion.match { border-color: var(--purple-200); }
+    .accordion.match .acc-header { background: var(--purple-50); }
+    .accordion.no-match { opacity: 0.45; }
+
+    .acc-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .acc-header:hover { background: var(--color-bg-secondary); }
+    .accordion.match .acc-header:hover { filter: brightness(0.97); }
+
+    .acc-chevron { font-size: 18px; color: var(--color-text-tertiary); flex-shrink: 0; transition: transform 0.2s; }
+    .acc-chevron.open { color: var(--purple-600); transform: rotate(0deg); }
+    .acc-chevron:not(.open) { transform: rotate(-90deg); }
+
+    .acc-question { flex: 1; font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+    .no-match .acc-question { font-weight: 400; color: var(--color-text-secondary); }
+
+    .acc-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+    .acc-body {
+      font-size: 14px; color: var(--color-text-secondary); line-height: 1.75;
+      border-top: 0.5px solid var(--color-border);
+      padding: 12px 16px 14px 46px;
+      display: none;
+    }
+    .acc-body.open { display: block; }
+
+    mark {
+      background: var(--amber-300);
+      color: var(--amber-900);
+      border-radius: 3px;
+      padding: 0 2px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      font-size: 12px; color: var(--color-text-tertiary);
+      display: flex; align-items: center; gap: 8px;
+      margin: 1.5rem 0 1rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 0.5px; background: var(--color-border);
+    }
+  </style>
+</head>
+<body>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  FAQ SEMANTIC SEARCH – UI REFERENCE MOCKUP                      ║
+  ║                                                                  ║
+  ║  This file is a static HTML mockup for design reference only.   ║
+  ║  It is NOT the actual frontend implementation.                   ║
+  ║                                                                  ║
+  ║  Use this file to:                                               ║
+  ║    • Understand the intended UI layout and component structure   ║
+  ║    • See color tokens, spacing, and interaction states           ║
+  ║    • Replicate the styling in the Vite + React implementation    ║
+  ║                                                                  ║
+  ║  Key design decisions reflected here:                            ║
+  ║    • Matched FAQs → purple border + amber <mark> highlights      ║
+  ║    • Score badge per result (from ES _score, normalized 0–1)     ║
+  ║    • Non-matches dimmed (opacity 0.45) and collapsed             ║
+  ║    • Accordion chevron rotates on open/close                     ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+
+<div class="mockup-banner">
+  <i class="ti ti-palette" style="font-size:14px"></i>
+  <span>UI Reference Mockup – nicht interaktiv mit echtem Backend</span>
+</div>
+
+<div class="app">
+
+  <div class="header">
+    <h1>Häufig gestellte Fragen</h1>
+    <p>Durchsuche unsere FAQs – semantische Suche findet auch ähnliche Formulierungen</p>
+  </div>
+
+  <!-- Search bar -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input
+        class="search-input"
+        type="text"
+        placeholder='z.B. „Wie kann ich mein Passwort zurücksetzen?"'
+        value="Passwort vergessen"
+      />
+    </div>
+    <button class="search-btn">
+      <i class="ti ti-sparkles"></i> Suchen
+    </button>
+  </div>
+
+  <!-- Status bar (shown after search) -->
+  <div class="status-bar">
+    <span class="status-tag">
+      <i class="ti ti-filter" style="font-size:15px"></i>
+      <span class="badge">3 Treffer</span> für „Passwort vergessen"
+    </span>
+    <button class="clear-btn">
+      <i class="ti ti-x" style="font-size:13px"></i> Suche zurücksetzen
+    </button>
+  </div>
+
+  <!-- Match 1 – open, top result -->
+  <div class="accordion match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron open"></i>
+      <span class="acc-question">Wie kann ich mein Passwort zurücksetzen?</span>
+      <div class="acc-meta">
+        <span class="badge-score">Score 0.97</span>
+        <span class="badge-top">Top-Treffer</span>
+      </div>
+    </div>
+    <div class="acc-body open">
+      Um dein <mark>Passwort zurückzusetzen</mark>, klicke auf der Anmeldeseite auf
+      „<mark>Passwort vergessen</mark>". Du erhältst dann eine E-Mail mit einem Link,
+      über den du ein neues <mark>Passwort</mark> festlegen kannst.
+      Der Link ist 24 Stunden gültig.
+    </div>
+  </div>
+
+  <!-- Match 2 – open -->
+  <div class="accordion match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron open"></i>
+      <span class="acc-question">Wie ändere ich meine Zugangsdaten?</span>
+      <div class="acc-meta">
+        <span class="badge-score">Score 0.84</span>
+      </div>
+    </div>
+    <div class="acc-body open">
+      Deine <mark>Zugangsdaten</mark> kannst du jederzeit in den Kontoeinstellungen anpassen.
+      Unter „Sicherheit" findest du die Option, dein <mark>Passwort</mark> zu ändern
+      sowie die Zwei-Faktor-Authentifizierung zu aktivieren.
+    </div>
+  </div>
+
+  <!-- Match 3 – open -->
+  <div class="accordion match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron open"></i>
+      <span class="acc-question">Mein Konto ist gesperrt – was tun?</span>
+      <div class="acc-meta">
+        <span class="badge-score">Score 0.71</span>
+      </div>
+    </div>
+    <div class="acc-body open">
+      Nach mehreren fehlgeschlagenen <mark>Anmeldeversuchen</mark> wird dein Konto temporär gesperrt.
+      Warte 15 Minuten oder nutze die „<mark>Passwort vergessen</mark>"-Funktion,
+      um sofort wieder Zugriff zu erhalten. Bei weiteren Problemen wende dich an den Support.
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider">Weitere FAQs (kein Treffer)</div>
+
+  <!-- Non-match 1 – collapsed, dimmed -->
+  <div class="accordion no-match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron"></i>
+      <span class="acc-question">Welche Zahlungsmethoden werden akzeptiert?</span>
+    </div>
+    <div class="acc-body">
+      Wir akzeptieren Kreditkarten (Visa, Mastercard, Amex), SEPA-Lastschrift und PayPal.
+      Für Jahresabonnements ist auch Rechnung möglich.
+    </div>
+  </div>
+
+  <!-- Non-match 2 -->
+  <div class="accordion no-match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron"></i>
+      <span class="acc-question">Wie kann ich mein Abonnement kündigen?</span>
+    </div>
+    <div class="acc-body">
+      Du kannst dein Abonnement jederzeit in den Einstellungen unter „Abonnement" kündigen.
+      Die Kündigung gilt zum Ende der aktuellen Laufzeit.
+    </div>
+  </div>
+
+  <!-- Non-match 3 -->
+  <div class="accordion no-match">
+    <div class="acc-header" onclick="toggle(this)">
+      <i class="ti ti-chevron-down acc-chevron"></i>
+      <span class="acc-question">Gibt es eine mobile App?</span>
+    </div>
+    <div class="acc-body">
+      Ja, unsere App ist für iOS und Android verfügbar. Du findest sie im App Store und Google Play.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    const chevron = header.querySelector('.acc-chevron');
+    const body = header.nextElementSibling;
+    const isOpen = chevron.classList.contains('open');
+    chevron.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  }
+</script>
+
+</body>
+</html>
