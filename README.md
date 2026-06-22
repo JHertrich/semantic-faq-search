@@ -281,6 +281,77 @@ To improve ranking for indirect queries, possible approaches are:
 - **Larger model** (`.multilingual-e5-base` or `.multilingual-e5-large`) — better language understanding at the cost of more RAM and inference latency.
 - **FAQ content expansion** — adding synonyms or paraphrase variants to FAQ answers so semantically indirect queries find a closer match.
 - **Hybrid search** — combine semantic with BM25 keyword search (`rrf` rescoring). Keyword matches reinforce semantic results for literal terms like "Slack" or "Webhook".
+- **Cross-encoder reranking** — see section below for a detailed analysis of why this is the right architecture and what is required.
+
+---
+
+### Cross-encoder reranking — why and why not yet
+
+#### The precision problem
+
+The `.multilingual-e5-small` bi-encoder scores cluster tightly in the 1.80–1.89 range. For a query like "Passwort vergessen", five FAQs score above the threshold — but only one is truly relevant. The bi-encoder cannot distinguish "very relevant" from "marginally related" because it embeds the query and document independently: there is no cross-attention between the two texts.
+
+A **cross-encoder** solves this by processing query and document together. It produces much more spread-out scores (e.g. 0.95 for the correct FAQ, 0.12 for a tangentially related one), enabling a precision threshold that actually works.
+
+#### What was tried
+
+`Xenova/ms-marco-MiniLM-L-6-v2` (cross-encoder, ~40 MB ONNX) was integrated via `@xenova/transformers`. The model was loaded at service startup and applied as a reranking step after ES retrieval.
+
+**Result: the model returned `score = 1.000` for every input, including completely off-topic German queries ("Wie ist das Wetter in München?").**
+
+The root cause: this model was trained exclusively on English MS-MARCO data. For German text, the model encounters out-of-distribution tokens, produces extreme logits, and sigmoid collapses these to 1.0. The model cannot evaluate German relevance at all.
+
+#### Requirements for a working implementation
+
+A cross-encoder reranker for German FAQ search requires a **multilingual** model. Options, in order of implementation effort:
+
+| Option | Quality | Effort | Notes |
+|---|---|---|---|
+| **Cohere Rerank API** (`rerank-multilingual-v3.0`) | Excellent | Low | Free tier: 1 000 req/month. Requires Cohere API key. Integrates directly into ES via `_inference` API. |
+| **`.multilingual-e5-large`** (upgrade bi-encoder) | Good | Very low | No code changes — swap model ID in `mapping.ts`. Requires ~8 GB RAM. Improves the bi-encoder score spread but does not solve the fundamental architecture gap. |
+| **Deploy multilingual cross-encoder to ES** (via Eland) | Excellent | High | Requires Python + `eland` to convert `cross-encoder/ms-marco-multilingual-MiniLM-L12-v2` to ES-compatible format. Fully local, no external API. |
+
+#### Recommended next step: Cohere Rerank
+
+The Cohere integration requires no model deployment. Once a free API key is obtained:
+
+```
+# 1. Create the rerank inference endpoint in Kibana Dev Tools
+PUT _inference/rerank/my-cohere-reranker
+{
+  "service": "cohere",
+  "service_settings": {
+    "api_key": "<your-key>",
+    "model_id": "rerank-multilingual-v3.0"
+  }
+}
+
+# 2. The service query changes from semantic+min_score to:
+POST faqs/_search
+{
+  "retriever": {
+    "text_similarity_reranker": {
+      "retriever": {
+        "standard": {
+          "query": {
+            "bool": {
+              "should": [
+                { "semantic": { "field": "question", "query": "..." } },
+                { "semantic": { "field": "answer",   "query": "..." } }
+              ]
+            }
+          }
+        }
+      },
+      "field": "answer",
+      "inference_id": "my-cohere-reranker",
+      "rank_window_size": 20
+    }
+  }
+}
+```
+
+The reranker score replaces `min_score` — a threshold of ~0.3–0.5 on the Cohere score would need to be calibrated via the evaluation script after integration.
 
 ### Re-running the evaluation
 

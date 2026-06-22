@@ -180,8 +180,6 @@ async function main() {
     }
 
     const recallRate  = recall  / POSITIVE_CASES.length;
-    const p1Rate      = p1      / POSITIVE_CASES.length;
-    const p3Rate      = p3      / POSITIVE_CASES.length;
     const specRate    = trueNeg / NEGATIVE_CASES.length;
     const f1 = recallRate + specRate > 0
       ? (2 * recallRate * specRate) / (recallRate + specRate)
@@ -212,23 +210,6 @@ async function main() {
     console.log(`    from ${CURRENT_THRESHOLD} to ${bestThreshold}\n`);
   } else {
     console.log(`  Current setting is already optimal.\n`);
-  }
-
-  // ── 5. Queries below optimal threshold ────────────────────────────────
-  const missedPositive = allResults.filter(({ testCase: tc, hits }) => {
-    if (tc.isNegative) return false;
-    const expectedHit = hits.find((h) => h.id === tc.expectedFaqId);
-    return !expectedHit || expectedHit.score < bestThreshold;
-  });
-
-  if (missedPositive.length > 0) {
-    console.log(`  Positive queries below optimal threshold (consider rewording FAQs or boosting):`);
-    for (const { testCase: tc, hits } of missedPositive) {
-      const expected = hits.find((h) => h.id === tc.expectedFaqId);
-      console.log(`    • ${tc.description}: score ${expected?.score.toFixed(3) ?? 'n/a'} < ${bestThreshold}`);
-      console.log(`      Query: "${tc.query}"`);
-    }
-    console.log('');
   }
 
   process.exit(0);

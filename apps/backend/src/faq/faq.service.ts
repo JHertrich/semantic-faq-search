@@ -73,9 +73,9 @@ export class FaqService {
         highlight: {
           fields: {
             question: { fragment_size: 200, number_of_fragments: 1 },
-            answer: { fragment_size: 200, number_of_fragments: 1 },
+            answer:   { fragment_size: 200, number_of_fragments: 1 },
           },
-          pre_tags: ['<mark>'],
+          pre_tags:  ['<mark>'],
           post_tags: ['</mark>'],
         },
         min_score: 1.80,
@@ -83,13 +83,13 @@ export class FaqService {
 
       return response.hits.hits
         .map((hit) => ({
-          id: hit._source!.id,
+          id:       hit._source!.id,
           question: extractText(hit._source!.question),
-          answer: extractText(hit._source!.answer),
-          score: hit._score ?? 0,
+          answer:   extractText(hit._source!.answer),
+          score:    hit._score ?? 0,
           highlight: {
             question: hit.highlight?.['question'] as string[] | undefined,
-            answer: hit.highlight?.['answer'] as string[] | undefined,
+            answer:   hit.highlight?.['answer']   as string[] | undefined,
           },
         }))
         .sort((a, b) => b.score - a.score);
