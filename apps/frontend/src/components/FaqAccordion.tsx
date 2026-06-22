@@ -1,0 +1,53 @@
+import { useState } from 'react';
+
+interface Props {
+  question: string;
+  answer: string;
+  isMatch?: boolean;
+  score?: number;
+  highlight?: { question?: string[]; answer?: string[] };
+  defaultOpen?: boolean;
+}
+
+export function FaqAccordion({ question, answer, isMatch, score, highlight, defaultOpen }: Props) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+
+  const displayAnswer = highlight?.answer?.[0] ?? highlight?.question?.[0] ?? null;
+  const displayQuestion = highlight?.question?.[0] ?? question;
+
+  const isTopResult = isMatch && score !== undefined && score >= 1.82;
+
+  return (
+    <div className={`accordion ${isMatch ? 'match' : 'no-match'}`}>
+      <div className="acc-header" onClick={() => setOpen((o) => !o)} role="button" tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && setOpen((o) => !o)}>
+        <svg
+          className={`acc-chevron ${open ? 'open' : ''}`}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          width="18" height="18"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+        <span
+          className="acc-question"
+          dangerouslySetInnerHTML={{ __html: isMatch ? displayQuestion : question }}
+        />
+        {isMatch && score !== undefined && (
+          <div className="acc-meta">
+            <span className="badge-score">Score {score.toFixed(2)}</span>
+            {isTopResult && <span className="badge-top">Top-Treffer</span>}
+          </div>
+        )}
+      </div>
+      {open && (
+        <div className="acc-body open">
+          {displayAnswer ? (
+            <span dangerouslySetInnerHTML={{ __html: displayAnswer }} />
+          ) : (
+            answer
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
