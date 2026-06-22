@@ -42,7 +42,31 @@ Open Kibana at **http://localhost:5601** → **Stack Management → License Mana
 
 ### 4. Download the ML model and create the inference endpoint
 
-Run these two commands in order:
+You can do this either via the Kibana UI or via curl.
+
+#### Option A — Kibana UI
+
+1. Open **http://localhost:5601** → **Machine Learning** → **Model Management** → **Trained Models**
+2. Click **"Add a trained model"** → **"Download model"**
+3. Search for `.multilingual-e5-small` and start the download (~470 MB, 1–2 min)
+4. Once the status shows *Downloaded*, click **"Start deployment"**
+5. Open **Dev Tools** and run:
+
+```
+PUT _inference/text_embedding/my-e5-endpoint
+{
+  "service": "elasticsearch",
+  "service_settings": {
+    "num_allocations": 1,
+    "num_threads": 1,
+    "model_id": ".multilingual-e5-small"
+  }
+}
+```
+
+> Alternatively, the inference endpoint can also be created via **Stack Management → Inference Endpoints** (Kibana 8.15+).
+
+#### Option B — curl
 
 ```bash
 # Download the multilingual E5 model into Elasticsearch (~470 MB)
@@ -51,7 +75,12 @@ curl -s -X POST "http://localhost:5601/internal/ml/trained_models/install_elasti
   -H "elastic-api-version: 1" \
   -H "Content-Type: application/json"
 
-# Wait until the download is complete (~1-2 min), then create the inference endpoint
+# Verify the download is complete before continuing (~1-2 min)
+curl -s "http://localhost:9200/_ml/trained_models/.multilingual-e5-small/_stats" | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); print(d['trained_model_stats'][0]['model_size_stats']['model_size_bytes'])"
+# Should print 470097544
+
+# Create the inference endpoint
 curl -s -X PUT "http://localhost:9200/_inference/text_embedding/my-e5-endpoint" \
   -H "Content-Type: application/json" \
   -d '{
@@ -62,13 +91,6 @@ curl -s -X PUT "http://localhost:9200/_inference/text_embedding/my-e5-endpoint" 
       "model_id": ".multilingual-e5-small"
     }
   }'
-```
-
-Verify the download is complete before creating the endpoint:
-```bash
-curl -s "http://localhost:9200/_ml/trained_models/.multilingual-e5-small/_stats" | \
-  python3 -c "import sys,json; d=json.load(sys.stdin); print(d['trained_model_stats'][0]['model_size_stats']['model_size_bytes'])"
-# Should print 470097544
 ```
 
 > The model and inference endpoint are persisted in the ES data volume.
