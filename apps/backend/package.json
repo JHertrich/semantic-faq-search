@@ -1,0 +1,32 @@
+{
+  "name": "faq-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main",
+    "setup": "ts-node -r tsconfig-paths/register src/scripts/setup-index.ts",
+    "evaluate": "ts-node -r tsconfig-paths/register src/scripts/evaluate-search.ts"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.13.1",
+    "@nestjs/common": "^10.3.10",
+    "@nestjs/core": "^10.3.10",
+    "@nestjs/elasticsearch": "^10.0.1",
+    "@nestjs/platform-express": "^10.3.10",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "@xenova/transformers": "^2.17.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.5",
+    "@nestjs/schematics": "^10.1.4",
+    "@types/node": "^20.14.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.3"
+  }
+}
