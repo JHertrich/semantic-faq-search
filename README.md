@@ -430,3 +430,9 @@ GET _ml/info
 ## Next Steps / Roadmap
 
 See **[OPTIMIZATION-OPTIONS.md](./OPTIMIZATION-OPTIONS.md)** for a structured overview of all optimization paths — ordered by effort and quality impact, with infrastructure trade-offs and a recommended prioritization for production.
+
+---
+
+## Background: How Vectors Work
+
+New to semantic search? **[docs/how-vectors-work.md](./docs/how-vectors-work.md)** explains embeddings, cosine similarity, and the bi-encoder/cross-encoder distinction in plain language.
