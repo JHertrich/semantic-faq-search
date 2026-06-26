@@ -311,6 +311,8 @@ A cross-encoder reranker for German FAQ search requires a **multilingual** model
 | **`.multilingual-e5-large`** (upgrade bi-encoder) | Good | Very low | No code changes — swap model ID in `mapping.ts`. Requires ~8 GB RAM. Improves the bi-encoder score spread but does not solve the fundamental architecture gap. |
 | **Deploy multilingual cross-encoder to ES** (via Eland) | Excellent | High | Requires Python + `eland` to convert `cross-encoder/ms-marco-multilingual-MiniLM-L12-v2` to ES-compatible format. Fully local, no external API. |
 
+For a detailed comparison of all options including effort estimates, infrastructure trade-offs, and a recommended prioritization for production, see **[OPTIMIZATION-OPTIONS.md](./OPTIMIZATION-OPTIONS.md)**.
+
 #### Recommended next step: Cohere Rerank
 
 The Cohere integration requires no model deployment. Once a free API key is obtained:
@@ -422,3 +424,9 @@ GET _inference/text_embedding/my-e5-endpoint
 # Check ML node info
 GET _ml/info
 ```
+
+---
+
+## Next Steps / Roadmap
+
+See **[OPTIMIZATION-OPTIONS.md](./OPTIMIZATION-OPTIONS.md)** for a structured overview of all optimization paths — ordered by effort and quality impact, with infrastructure trade-offs and a recommended prioritization for production.
