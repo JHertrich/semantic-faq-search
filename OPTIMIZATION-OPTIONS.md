@@ -24,10 +24,25 @@ Der Prototyp nutzt das **`.multilingual-e5-small`**-Modell in Elasticsearch als 
 | # | Option | Aufwand | Qualitätsgewinn | Datenschutz | Empfehlung |
 |---|---|---|---|---|---|
 | 1 | **E5-Large-Modell** | Sehr gering | Mittel | Lokal ✓ | Schneller erster Schritt |
-| 2 | **Cohere Rerank API** | Gering | Hoch | Extern ⚠ | Beste Quick-Win-Option |
+| 2 | **Cohere Rerank API** | Gering | Hoch | Extern ✗ | Nur ohne Datenschutzanforderungen |
 | 3 | **RRF Hybridsuche** | Mittel | Gering–Mittel | Lokal ✓ | Nur ergänzend sinnvoll |
 | 4 | **FAQ-Inhaltserweiterung** | Mittel | Mittel (gezielt) | Lokal ✓ | Parallelmaßnahme |
-| 5 | **Eland Cross-Encoder** | Hoch | Hoch | Lokal ✓ | Beste Option für Produktion |
+| 5 | **Eland Cross-Encoder** | Hoch | Hoch | Lokal ✓ | **Empfohlen für Produktion** |
+
+### Elastic-eigene Reranker — warum sie hier nicht passen
+
+Elasticsearch bringt seit 8.16 zwei eingebettete Reranker-Optionen mit, die keinen Eland-Import benötigen:
+
+| Modell | Sprache | Daten lokal? | Geeignet? |
+|---|---|---|---|
+| **`.rerank-v1`** | Englisch only | Ja — läuft in ES ✓ | Nein — für deutschsprachige Inhalte unbrauchbar |
+| **`.jina-reranker-v3`** | Multilingual ✓ | Nein — läuft über Elastic Inference Service (EIS) ✗ | Nein — Daten verlassen die Infrastruktur |
+
+**`.rerank-v1`** wäre ideal (kein Setup-Aufwand, vollständig lokal, identisches API wie Eland-Modelle) — scheitert aber am gleichen Problem wie das früher getestete `ms-marco-MiniLM`: englisches Trainingsset, deutschsprachige Eingaben produzieren unbrauchbare Scores.
+
+**`.jina-reranker-v3`** ist multilingual und qualitativ stark, läuft aber über den Elastic Inference Service — ein von Elastic betriebener Cloud-Dienst. Für Anwendungen mit interner Datenhaltung ist das gleichbedeutend mit der Cohere-API-Option: Daten verlassen den eigenen Cluster.
+
+**Konsequenz:** Für deutschsprachige Inhalte mit interner Datenhaltung führt kein Weg an Option 5 (Eland) vorbei.
 
 ---
 
@@ -271,23 +286,23 @@ Das Modell läuft dauerhaft in Elasticsearch. Für Produktionsbetrieb:
 
 ## Empfehlung: Priorisierung für Produktion
 
+> **Rahmenbedingung:** Daten dürfen die eigene Infrastruktur nicht verlassen → Cohere API und Elastic Inference Service (`.jina-reranker-v3`) scheiden aus. Das eingebaute `.rerank-v1` ist englischsprachig und damit ebenfalls ungeeignet.
+
 ### Sofort (vor Produktion, geringer Aufwand)
 
 1. **Option 1 — E5-Large** als Drop-in-Ersatz. Modell-ID ändern, Index neu aufbauen, Threshold neu kalibrieren. Verbessert P@1 ohne Architekturänderung.
 
 2. **Option 4 — FAQ-Inhalte** für die 3–5 bekannten Problemfälle gezielt ergänzen. Kein Code, kein Infrastrukturaufwand.
 
-### Mittelfristig (Validierungsschritt)
+### Produktion (Cross-Encoder)
 
-3. **Option 2 — Cohere Rerank** als schnellen Test der Cross-Encoder-Architektur. Wenn Cohere P@1 auf >90 % hebt, ist die Investition in Eland gerechtfertigt. Falls Datenschutzanforderungen bestehen, diesen Schritt überspringen.
+3. **Option 5 — Eland + `BAAI/bge-reranker-v2-m3`** als permanente Lösung. Vollständig lokal, multilingual, löst das Präzisionsproblem des Bi-Encoders grundsätzlich. Erfordert eine einmalige Python-Umgebung für den Modell-Import (~2–4 Stunden Setup).
 
-### Produktion (wenn Datenschutz oder Kostenkontrolle wichtig)
+   Da Cohere als Validierungsschritt ausscheidet, empfiehlt sich folgender Nachweis vorab: E5-Large (Option 1) mit dem Evaluierungsskript messen. Wenn P@1 danach noch unter 85 % liegt, ist der Eland-Aufwand klar gerechtfertigt.
 
-4. **Option 5 — Eland** als permanente Lösung. Gleiche Qualitätsstufe wie Cohere, vollständig lokal. Erfordert Python-Umgebung für den initialen Modell-Import.
+### Ergänzend
 
-### RRF
-
-5. **Option 3 — RRF** nur als ergänzende Maßnahme nach Option 1 oder 5, nicht als primäres Upgrade.
+4. **Option 3 — RRF** nur als Ergänzung nach Option 1 oder 5, nicht als primäres Upgrade.
 
 ---
 
