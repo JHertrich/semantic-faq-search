@@ -212,6 +212,10 @@ Funktioniert nur für bekannte Lücken. Neue User-Formulierungen, die nicht anti
 
 Ein mehrsprachiges Cross-Encoder-Modell (`BAAI/bge-reranker-v2-m3`) wird über das **Eland**-Tool in Elasticsearch selbst deployt. Keine externen APIs, keine Daten verlassen die Infrastruktur.
 
+**Warum Python?** Elasticsearch kann keine Hugging-Face-Modelle direkt laden — es braucht die Gewichte in einem ES-internen Format (TorchScript). Eland ist ein Python-Paket, das genau diese Konvertierung übernimmt und das Modell anschließend per API hochlädt. Python wird nur für diesen einmaligen Import-Schritt benötigt, danach läuft alles in ES.
+
+**Was ist Hugging Face?** Eine öffentliche Plattform für KI-Modelle — im Prinzip das GitHub für Machine Learning. `BAAI/bge-reranker-v2-m3` wurde dort vom Beijing Academy of Artificial Intelligence veröffentlicht und ist kostenlos nutzbar. Das eingebaute `.multilingual-e5-small` hat Elastic bereits fertig konvertiert mitgeliefert — für alle anderen Modelle braucht man Eland.
+
 ### Architektur
 
 ```
