@@ -7,7 +7,7 @@ export const faqMapping: Record<string, MappingProperty> = {
   id: {
     type: 'keyword',
   },
-  question: {
+  questions: {
     type: 'semantic_text' as unknown as 'text',
     inference_id: INFERENCE_ENDPOINT_ID,
   } as any,

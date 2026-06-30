@@ -11,7 +11,7 @@ type SemanticField = string | SemanticTextField;
 
 interface FaqRawSource {
   id: string;
-  question: SemanticField | SemanticField[];
+  questions: SemanticField[];
   answer: SemanticField;
   answerHtml?: string;
 }
@@ -56,7 +56,7 @@ export class FaqService {
 
       return response.hits.hits.map((hit) => ({
         id: hit._source!.id,
-        questions: extractTexts(hit._source!.question),
+        questions: extractTexts(hit._source!.questions),
         answer: hit._source!.answerHtml ?? extractText(hit._source!.answer),
       }));
     } catch (err) {
@@ -72,16 +72,16 @@ export class FaqService {
         query: {
           bool: {
             should: [
-              { semantic: { field: 'question', query } } as any,
-              { semantic: { field: 'answer',   query } } as any,
+              { semantic: { field: 'questions', query } } as any,
+              { semantic: { field: 'answer',    query } } as any,
             ],
             minimum_should_match: 1,
           },
         },
         highlight: {
           fields: {
-            question: { fragment_size: 200, number_of_fragments: 1 },
-            answer:   { fragment_size: 200, number_of_fragments: 1 },
+            questions: { fragment_size: 200, number_of_fragments: 1 },
+            answer:    { fragment_size: 200, number_of_fragments: 1 },
           },
           pre_tags:  ['<mark>'],
           post_tags: ['</mark>'],
@@ -92,12 +92,12 @@ export class FaqService {
       return response.hits.hits
         .map((hit) => ({
           id:        hit._source!.id,
-          questions: extractTexts(hit._source!.question),
+          questions: extractTexts(hit._source!.questions),
           answer:    hit._source!.answerHtml ?? extractText(hit._source!.answer),
           score:     hit._score ?? 0,
           highlight: {
-            question: hit.highlight?.['question'] as string[] | undefined,
-            answer:   hit.highlight?.['answer']   as string[] | undefined,
+            question: hit.highlight?.['questions'] as string[] | undefined,
+            answer:   hit.highlight?.['answer']    as string[] | undefined,
           },
         }))
         .sort((a, b) => b.score - a.score);

@@ -49,7 +49,7 @@ async function main(): Promise<void> {
       id: faq.id,
       document: {
         id: faq.id,
-        question: faq.questions,
+        questions: faq.questions,
         answer: stripHtml(faq.answer),
         answerHtml: faq.answer,
       },
