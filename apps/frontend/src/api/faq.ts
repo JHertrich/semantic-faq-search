@@ -1,6 +1,6 @@
 export interface Faq {
   id: string;
-  question: string;
+  questions: string[];
   answer: string;
 }
 

@@ -316,6 +316,34 @@ body {
   padding: 12px 16px 14px 46px;
 }
 
+.acc-body p {
+  margin-bottom: 0.6em;
+}
+
+.acc-body p:last-child {
+  margin-bottom: 0;
+}
+
+.acc-body ul,
+.acc-body ol {
+  padding-left: 1.25em;
+  margin-bottom: 0.6em;
+}
+
+.acc-body li {
+  margin-bottom: 0.2em;
+}
+
+.acc-body a {
+  color: var(--purple-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.acc-body a:hover {
+  opacity: 0.75;
+}
+
 mark {
   background: var(--amber-300);
   color: var(--amber-900);

@@ -4,6 +4,23 @@ import { INDEX_NAME, faqMapping } from '../elastic/mapping';
 
 const ES_URL = process.env.ES_URL || 'http://localhost:9200';
 
+function stripHtml(html: string): string {
+  return html
+    // block elements → Leerzeichen, damit Wortgrenzen erhalten bleiben
+    .replace(/<\/?(?:p|ul|ol|li)\b[^>]*>/gi, ' ')
+    // inline elements → nur Tags entfernen, Inhalt behalten
+    .replace(/<\/?(?:strong|span|a|em)\b[^>]*>/gi, '')
+    // HTML-Entities
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    // Whitespace normalisieren
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function main(): Promise<void> {
   const client = new Client({ node: ES_URL });
 
@@ -25,15 +42,16 @@ async function main(): Promise<void> {
 
   let indexed = 0;
   for (const faq of faqs) {
-    console.log(`[${indexed + 1}/${faqs.length}] Indexing: ${faq.question}`);
+    console.log(`[${indexed + 1}/${faqs.length}] Indexing: ${faq.questions[0]}`);
 
     await client.index({
       index: INDEX_NAME,
       id: faq.id,
       document: {
         id: faq.id,
-        question: faq.question,
-        answer: faq.answer,
+        question: faq.questions,
+        answer: stripHtml(faq.answer),
+        answerHtml: faq.answer,
       },
     });
 

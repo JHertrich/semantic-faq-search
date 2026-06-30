@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface Props {
-  question: string;
+  questions: string[];
   answer: string;
   isMatch?: boolean;
   score?: number;
@@ -9,11 +9,11 @@ interface Props {
   defaultOpen?: boolean;
 }
 
-export function FaqAccordion({ question, answer, isMatch, score, highlight, defaultOpen }: Props) {
+export function FaqAccordion({ questions, answer, isMatch, score, highlight, defaultOpen }: Props) {
   const [open, setOpen] = useState(defaultOpen ?? false);
 
-  const displayAnswer = highlight?.answer?.[0] ?? highlight?.question?.[0] ?? null;
-  const displayQuestion = highlight?.question?.[0] ?? question;
+  const canonicalQuestion = questions[0];
+  const displayAnswer = highlight?.answer?.[0] ?? null;
 
   const isTopResult = isMatch && score !== undefined && score >= 1.82;
 
@@ -30,7 +30,7 @@ export function FaqAccordion({ question, answer, isMatch, score, highlight, defa
         </svg>
         <span
           className="acc-question"
-          dangerouslySetInnerHTML={{ __html: isMatch ? displayQuestion : question }}
+          dangerouslySetInnerHTML={{ __html: canonicalQuestion }}
         />
         {isMatch && score !== undefined && (
           <div className="acc-meta">
@@ -41,11 +41,7 @@ export function FaqAccordion({ question, answer, isMatch, score, highlight, defa
       </div>
       {open && (
         <div className="acc-body open">
-          {displayAnswer ? (
-            <span dangerouslySetInnerHTML={{ __html: displayAnswer }} />
-          ) : (
-            answer
-          )}
+          <div dangerouslySetInnerHTML={{ __html: displayAnswer ?? answer }} />
         </div>
       )}
     </div>

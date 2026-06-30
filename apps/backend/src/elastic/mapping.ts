@@ -15,4 +15,8 @@ export const faqMapping: Record<string, MappingProperty> = {
     type: 'semantic_text' as unknown as 'text',
     inference_id: INFERENCE_ENDPOINT_ID,
   } as any,
+  answerHtml: {
+    type: 'text',
+    index: false,
+  },
 };

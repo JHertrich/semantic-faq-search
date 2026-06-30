@@ -11,7 +11,7 @@ export function FaqList({ faqs, results }: Props) {
     return (
       <div>
         {faqs.map((faq) => (
-          <FaqAccordion key={faq.id} question={faq.question} answer={faq.answer} />
+          <FaqAccordion key={faq.id} questions={faq.questions} answer={faq.answer} />
         ))}
       </div>
     );
@@ -25,7 +25,7 @@ export function FaqList({ faqs, results }: Props) {
       {results.map((result) => (
         <FaqAccordion
           key={result.id}
-          question={result.question}
+          questions={result.questions}
           answer={result.answer}
           isMatch
           score={result.score}
@@ -38,7 +38,7 @@ export function FaqList({ faqs, results }: Props) {
         <>
           <div className="divider">Weitere FAQs (kein Treffer)</div>
           {unmatched.map((faq) => (
-            <FaqAccordion key={faq.id} question={faq.question} answer={faq.answer} />
+            <FaqAccordion key={faq.id} questions={faq.questions} answer={faq.answer} />
           ))}
         </>
       )}

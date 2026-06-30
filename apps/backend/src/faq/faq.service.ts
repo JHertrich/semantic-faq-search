@@ -7,21 +7,29 @@ interface SemanticTextField {
   inference?: unknown;
 }
 
+type SemanticField = string | SemanticTextField;
+
 interface FaqRawSource {
   id: string;
-  question: string | SemanticTextField;
-  answer: string | SemanticTextField;
+  question: SemanticField | SemanticField[];
+  answer: SemanticField;
+  answerHtml?: string;
 }
 
 export interface FaqDocument {
   id: string;
-  question: string;
+  questions: string[];
   answer: string;
 }
 
-function extractText(field: string | SemanticTextField): string {
+function extractText(field: SemanticField): string {
   if (typeof field === 'string') return field;
   return field?.text ?? '';
+}
+
+function extractTexts(field: SemanticField | SemanticField[]): string[] {
+  if (Array.isArray(field)) return field.map(extractText);
+  return [extractText(field)];
 }
 
 export interface SearchResultItem extends FaqDocument {
@@ -48,8 +56,8 @@ export class FaqService {
 
       return response.hits.hits.map((hit) => ({
         id: hit._source!.id,
-        question: extractText(hit._source!.question),
-        answer: extractText(hit._source!.answer),
+        questions: extractTexts(hit._source!.question),
+        answer: hit._source!.answerHtml ?? extractText(hit._source!.answer),
       }));
     } catch (err) {
       this.logger.error('findAll failed', err);
@@ -83,10 +91,10 @@ export class FaqService {
 
       return response.hits.hits
         .map((hit) => ({
-          id:       hit._source!.id,
-          question: extractText(hit._source!.question),
-          answer:   extractText(hit._source!.answer),
-          score:    hit._score ?? 0,
+          id:        hit._source!.id,
+          questions: extractTexts(hit._source!.question),
+          answer:    hit._source!.answerHtml ?? extractText(hit._source!.answer),
+          score:     hit._score ?? 0,
           highlight: {
             question: hit.highlight?.['question'] as string[] | undefined,
             answer:   hit.highlight?.['answer']   as string[] | undefined,
