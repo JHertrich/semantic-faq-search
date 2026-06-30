@@ -5,7 +5,7 @@ interface Props {
   answer: string;
   isMatch?: boolean;
   score?: number;
-  highlight?: { question?: string[]; answer?: string[] };
+  highlight?: { questions?: string[]; answer?: string[] };
   defaultOpen?: boolean;
 }
 

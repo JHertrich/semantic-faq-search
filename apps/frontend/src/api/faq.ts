@@ -7,7 +7,7 @@ export interface Faq {
 export interface SearchResult extends Faq {
   score: number;
   highlight: {
-    question?: string[];
+    questions?: string[];
     answer?: string[];
   };
 }

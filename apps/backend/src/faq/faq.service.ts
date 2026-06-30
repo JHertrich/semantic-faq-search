@@ -1,18 +1,17 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
+import type { SearchRequest } from '@elastic/elasticsearch/lib/api/types';
 import { INDEX_NAME } from '../elastic/mapping';
 
 interface SemanticTextField {
-  text: string;
+  text: string | string[];
   inference?: unknown;
 }
 
-type SemanticField = string | SemanticTextField;
-
 interface FaqRawSource {
   id: string;
-  questions: SemanticField[];
-  answer: SemanticField;
+  questions: SemanticTextField;
+  answer: SemanticTextField;
   answerHtml?: string;
 }
 
@@ -22,20 +21,18 @@ export interface FaqDocument {
   answer: string;
 }
 
-function extractText(field: SemanticField): string {
-  if (typeof field === 'string') return field;
-  return field?.text ?? '';
+function extractTexts(field: SemanticTextField): string[] {
+  return Array.isArray(field.text) ? field.text : [field.text];
 }
 
-function extractTexts(field: SemanticField | SemanticField[]): string[] {
-  if (Array.isArray(field)) return field.map(extractText);
-  return [extractText(field)];
+function extractText(field: SemanticTextField): string {
+  return Array.isArray(field.text) ? field.text[0] ?? '' : field.text;
 }
 
 export interface SearchResultItem extends FaqDocument {
   score: number;
   highlight: {
-    question?: string[];
+    questions?: string[];
     answer?: string[];
   };
 }
@@ -67,13 +64,13 @@ export class FaqService {
 
   async search(query: string): Promise<SearchResultItem[]> {
     try {
-      const response = await this.esService.search<FaqRawSource>({
+      const searchParams: SearchRequest = {
         index: INDEX_NAME,
         query: {
           bool: {
             should: [
-              { semantic: { field: 'questions', query } } as any,
-              { semantic: { field: 'answer',    query } } as any,
+              { semantic: { field: 'questions', query } },
+              { semantic: { field: 'answer',    query } },
             ],
             minimum_should_match: 1,
           },
@@ -87,7 +84,8 @@ export class FaqService {
           post_tags: ['</mark>'],
         },
         min_score: 1.80,
-      } as any);
+      };
+      const response = await this.esService.search<FaqRawSource>(searchParams);
 
       return response.hits.hits
         .map((hit) => ({
@@ -96,8 +94,8 @@ export class FaqService {
           answer:    hit._source!.answerHtml ?? extractText(hit._source!.answer),
           score:     hit._score ?? 0,
           highlight: {
-            question: hit.highlight?.['questions'] as string[] | undefined,
-            answer:   hit.highlight?.['answer']    as string[] | undefined,
+            questions: hit.highlight?.['questions'],
+            answer:    hit.highlight?.['answer'],
           },
         }))
         .sort((a, b) => b.score - a.score);
